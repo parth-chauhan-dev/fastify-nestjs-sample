@@ -10,5 +10,4 @@ export class Initial1751347396658 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DROP TABLE "user"`);
     }
-
 }
