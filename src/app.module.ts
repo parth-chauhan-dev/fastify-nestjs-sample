@@ -3,9 +3,19 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/user.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: true,
+      graphiql: true,
+      context: ({ request  }) => ({ req: request }),
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       entities: [__dirname + '/**/*.entity{.ts,.js}'],

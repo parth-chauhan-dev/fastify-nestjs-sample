@@ -1,0 +1,39 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserListOutput {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+}
+
+type LoginOutput {
+  id: String!
+  name: String!
+  role: String!
+  token: String!
+  expiresIn: Float!
+}
+
+type Query {
+  getUser: [UserListOutput!]!
+}
+
+type Mutation {
+  signup(data: SignupInput!): String!
+  login(data: LoginInput!): LoginOutput!
+}
+
+input SignupInput {
+  email: String!
+  name: String!
+  password: String!
+  role: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}

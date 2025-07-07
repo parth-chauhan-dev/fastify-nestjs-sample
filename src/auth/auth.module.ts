@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { JwtStrategy } from './jwt.strategy';
+import { AuthResolver } from './auth.resolver';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, AuthResolver],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

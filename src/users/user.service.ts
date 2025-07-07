@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserEntity } from './entities/user.entity';
+import { UserListOutput } from './dtos';
 
 @Injectable()
 export class UserService {
@@ -9,8 +10,16 @@ export class UserService {
     return this.userRepository.create(user);
   }
   
-  async get() {
-    return this.userRepository.findAll();
+  async get(): Promise<UserListOutput[]> {
+    const users = await this.userRepository.findAll();
+    return users.map(user => {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+    });
   }
 
   async findByEmail(email: string) {
