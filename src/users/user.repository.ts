@@ -1,12 +1,14 @@
-import { Injectable } from "@nestjs/common/decorators/core/injectable.decorator";
-import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "./entities/user.entity";
-import { Repository } from "typeorm/repository/Repository";
+import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './entities/user.entity';
+import { Repository } from 'typeorm/repository/Repository';
 
 @Injectable()
 export class UserRepository {
-  constructor(@InjectRepository(UserEntity) 
-  private readonly userRepository: Repository<UserEntity>) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
   async create(user: Partial<UserEntity>) {
     return this.userRepository.save(user);
@@ -17,6 +19,9 @@ export class UserRepository {
   }
 
   async findByEmail(email: string) {
-    return this.userRepository.findOne({ where: { email } , select: { id: true, email: true, name: true, password: true, role: true } });
+    return this.userRepository.findOne({
+      where: { email },
+      select: { id: true, email: true, name: true, password: true, role: true },
+    });
   }
 }

@@ -22,7 +22,7 @@ type Query {
 }
 
 type Mutation {
-  signup(data: SignupInput!): String!
+  signup(data: SignupInput!): Boolean!
   login(data: LoginInput!): LoginOutput!
 }
 
@@ -36,4 +36,8 @@ input SignupInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+type Subscription {
+  userAdded: UserListOutput!
 }

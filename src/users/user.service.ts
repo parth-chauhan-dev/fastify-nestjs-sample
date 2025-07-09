@@ -6,13 +6,14 @@ import { UserListOutput } from './dtos';
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
-  async create(user: Partial<UserEntity>){
+  async create(user: Partial<UserEntity>) {
     return this.userRepository.create(user);
   }
-  
-  async get(): Promise<UserListOutput[]> {
+
+  async get(user): Promise<UserListOutput[]> {
+    console.log('user ==> ', user);
     const users = await this.userRepository.findAll();
-    return users.map(user => {
+    return users.map((user) => {
       return {
         id: user.id,
         name: user.name,

@@ -12,7 +12,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: readFileSync(
-        join(process.cwd(), configService.get<string>('JWT_PUBLIC_KEY_PATH') ?? ''),
+        join(
+          process.cwd(),
+          configService.get<string>('JWT_PUBLIC_KEY_PATH') ?? '',
+        ),
         'utf8',
       ),
       algorithms: ['RS256'],
