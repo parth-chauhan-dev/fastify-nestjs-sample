@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, UnauthorizedException } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
@@ -10,6 +10,10 @@ import { PubSubModule } from './pubsub/pubsub.module';
 import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 import { FrameworkModule } from './framework/framework.module.';
+import {
+  verifySubscriptionToken,
+  extractTokenFromConnectionParams,
+} from './framework/helpers/subscription-auth.helper';
 
 @Module({
   imports: [
@@ -22,36 +26,30 @@ import { FrameworkModule } from './framework/framework.module.';
       subscriptions: {
         'graphql-ws': {
           onConnect: async (ctx: any) => {
-            console.log('🔌 graphql-ws connected', ctx.connectionParams);
-            return {}; // allow anonymous
+            const token = extractTokenFromConnectionParams(
+              ctx.connectionParams,
+            );
+            try {
+              const user = token ? verifySubscriptionToken(token) : null;
+              return { user };
+            } catch (err) {
+              console.warn('GraphQL-WS token error:', err.message);
+              return {}; // anonymous
+            }
           },
         },
-
         'subscriptions-transport-ws': {
           onConnect: async (connectionParams: any) => {
-            console.log('connectionParams ==> ', connectionParams);
-            const token = connectionParams?.Authorization?.split(' ')[1];
-            console.log('token ==>', token);
-
-            const publicKeyPath = process.env.JWT_PUBLIC_KEY_PATH!;
-            const publicKey = fs.readFileSync(
-              join(process.cwd(), publicKeyPath ?? ''),
-              'utf8',
-            );
-
-            if (!publicKey) {
-              throw new Error('JWT public key not found or unreadable');
-            }
-
+            const token = extractTokenFromConnectionParams(connectionParams);
             try {
-              const user = jwt.verify(token, publicKey, {
-                algorithms: ['RS256'],
-              });
-
-              return { user }; // ✅ connection continues
-            } catch (error) {
-              console.warn('Invalid legacy token', error.message);
-              throw new Error('Unauthorized: Invalid token'); // ❌ connection is rejected
+              if (!token) {
+                throw new UnauthorizedException('Token is required');
+              }
+              const user = token ? verifySubscriptionToken(token) : null;
+              return { user };
+            } catch (err) {
+              console.warn('Legacy WS token error:', err.message);
+              throw new UnauthorizedException('Invalid token');
             }
           },
         },
